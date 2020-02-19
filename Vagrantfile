@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   create_consul_host config, "consul-server", serverIp, serverInit
 
   for host_number in 1..2
-  	hostname="host-#{host_number}"
+  	hostname="consul-node-#{host_number}"
   	clientIp="192.168.99.10#{host_number}"
 
 	clientInit = %(
