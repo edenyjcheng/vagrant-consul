@@ -3,16 +3,15 @@ Vagrant.configure("2") do |config|
 
   def create_consul_host(config, hostname, ip, initJson)
     config.vm.define hostname do |host|
-
-		host.vm.hostname = hostname
-		host.vm.provision "shell", path: "provision.sh"
-
-		host.vm.network "private_network", ip: ip
-		host.vm.provision "shell", inline: "echo '#{initJson}' > /etc/systemd/system/consul.d/init.json"
-		host.vm.provision "shell", inline: "service consul start"
+  		host.vm.hostname = hostname
+  		host.vm.provision "shell", path: "provision.sh"
+  		host.vm.network "private_network", ip: ip
+  		host.vm.provision "shell", inline: "echo '#{initJson}' > /etc/systemd/system/consul.d/init.json"
+  		host.vm.provision "shell", inline: "service consul start"
     end
   end
 
+  
   serverIp = "192.168.99.100"
   serverInit = %(
 	{
@@ -25,21 +24,22 @@ Vagrant.configure("2") do |config|
 	}
   )
 
+  #create the master server
   create_consul_host config, "consul-server", serverIp, serverInit
 
+  #looping for clusters
   for host_number in 1..2
-  	hostname="consul-node-#{host_number}"
-  	clientIp="192.168.99.10#{host_number}"
+  	hostname = "consul-node-#{host_number}"
+  	clientIp = "192.168.99.10#{host_number}"
+  	clientInit = %(
+  		{
+  			"advertise_addr": "#{clientIp}",
+  			"retry_join": ["#{serverIp}"],
+  			"data_dir": "/tmp/consul"
+  		}
+  	)
 
-	clientInit = %(
-		{
-			"advertise_addr": "#{clientIp}",
-			"retry_join": ["#{serverIp}"],
-			"data_dir": "/tmp/consul"
-		}
-	)
-
-	create_consul_host config, hostname, clientIp, clientInit
+	   create_consul_host config, hostname, clientIp, clientInit
   end
 
 end

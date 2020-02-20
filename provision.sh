@@ -5,11 +5,11 @@ dpkg -s unzip &>/dev/null || {
 	apt-get -y update && apt-get install -y unzip
 }
 
-# install consul 
+# install consul
 if [ ! -f /usr/local/bin/consul ]; then
 	cd /usr/local/bin
 
-	version='0.8.0'
+	version='1.7.0'
 	wget https://releases.hashicorp.com/consul/${version}/consul_${version}_linux_amd64.zip -O consul.zip
 	unzip consul.zip
 	rm consul.zip
